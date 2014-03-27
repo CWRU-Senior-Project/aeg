@@ -1,9 +1,4 @@
-#include "Test.h"
-
-AEGTester::AEGTester()
-{
-	
-}
+#include "aeg/Test.h"
 
 void AEGTester::testWriteToFile()
 {
@@ -20,10 +15,9 @@ void AEGTester::testWriteToFile()
 
 	cout << "Completed testWriteToFile." << endl;
 }
-
 void AEGTester::testGenerateWorldFile()
 {
-	cout << "Starting testWriteToFile now." << endl;
-	xmlGen.generateWorldFile();
-	cout << "Completed testWriteToFile." << endl;
+   cout << "Starting testWriteToFile now." << endl;
+   xmlGen.generateWorldFile();
+   cout << "Completed testWriteToFile." << endl;
 }

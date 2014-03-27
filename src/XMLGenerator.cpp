@@ -1,11 +1,7 @@
-#include "XMLGenerator.h"
+#include "aeg/XMLGenerator.h"
 
 using namespace std;
 
-XMLGen::XMLGen()
-{
-
-}
 
 string XMLGen::generateWorldFile()
 {
@@ -23,19 +19,33 @@ list<string> XMLGen::generateWorld()
 	world.push_back(prefixSpacing + "<sdf version='1.4'>");
 	world.push_back(prefixSpacing + "   <world name='testWorld'>");
 
+
+
 	//	Basic world requirements
-	world.splice(world.end(), generateLight());
-	world.splice(world.end(), generateWorldPhysics());
-	world.splice(world.end(), generateScene());
-	world.splice(world.end(), generateSphericalCoordinates());
-	world.splice(world.end(), generateGUI());
+	list<string> temp = generateLight();
+	world.splice(world.end(), temp);
+
+	temp = generateWorldPhysics();
+	world.splice(world.end(), temp);
+
+	temp = generateScene();
+	world.splice(world.end(), temp);
+
+	temp = generateSphericalCoordinates();
+	world.splice(world.end(), temp);
+
+	temp = generateGUI();
+	world.splice(world.end(), temp);
 
 	//	Add existing models
 
 
 	//	Generate new models
-	world.splice(world.end(), generateGrassPlane());
-	world.splice(world.end(), generateStraightRoad(50.0, 7.0, 3.14159/4));
+	temp = generateGrassPlane();
+	world.splice(world.end(), temp);
+
+	temp = generateStraightRoad(50.0, 7.0, 3.14159/4);
+	world.splice(world.end(), temp);
 
 	world.push_back(prefixSpacing + "   </world>");
 	world.push_back(prefixSpacing + "</sdf>");
@@ -285,6 +295,7 @@ list<string> XMLGen::generateGrassPlane()
 list<string> XMLGen::generateStraightRoad(double length, double width, double angle)
 {
 	list<string> road;
+
 	string prefixSpacing = "      ";
 
 	road.push_back(prefixSpacing + "<model name='straightRoad'>");
@@ -293,7 +304,20 @@ list<string> XMLGen::generateStraightRoad(double length, double width, double an
 	road.push_back(prefixSpacing + "   <link name='roadLink_1'>");
 
 	//	pose: start at origin
-	road.push_back(prefixSpacing + "   <pose>" + to_string(width / 2) + " " + to_string(length / 2) + " 0.1  0 0 " + to_string(angle) + "</pose>");
+	stringstream sstream;
+	sstream << width / 2;
+	string tempWidth = sstream.str();
+        sstream.str(string());
+	
+        sstream << length / 2;
+	string tempLength = sstream.str();
+        sstream.str(string());
+	
+        sstream << angle;
+	string tempAngle = sstream.str();
+        sstream.str(string());
+
+	road.push_back(prefixSpacing + "   <pose>" + tempWidth + " " + tempLength + " 0.1  0 0 " + tempAngle + "</pose>");
 	
 
 	//	Collision
@@ -301,7 +325,16 @@ list<string> XMLGen::generateStraightRoad(double length, double width, double an
 	road.push_back(prefixSpacing + "         <geometry>");
 	road.push_back(prefixSpacing + "            <plane>");
 	road.push_back(prefixSpacing + "               <normal>0 0 1</normal>");
-	road.push_back(prefixSpacing + "               <size>" + to_string(width) + " " + to_string(length) + "</size>");
+
+	sstream << width;
+	tempWidth = sstream.str();
+        sstream.str(string());
+
+	sstream << length;
+	tempLength = sstream.str();
+        sstream.str(string());
+
+	road.push_back(prefixSpacing + "               <size>" + tempWidth + " " + tempLength + "</size>");
 	road.push_back(prefixSpacing + "            </plane>");
 	road.push_back(prefixSpacing + "         </geometry>");
 	road.push_back(prefixSpacing + "         <surface>");
@@ -326,7 +359,7 @@ list<string> XMLGen::generateStraightRoad(double length, double width, double an
 	road.push_back(prefixSpacing + "         <geometry>");
 	road.push_back(prefixSpacing + "            <plane>");
 	road.push_back(prefixSpacing + "               <normal>0 0 1</normal>");
-	road.push_back(prefixSpacing + "               <size>" + to_string(width) + " " + to_string(length) + "</size>");
+	road.push_back(prefixSpacing + "               <size>" + tempWidth + " " + tempLength + "</size>");
 	road.push_back(prefixSpacing + "            </plane>");
 	road.push_back(prefixSpacing + "         </geometry>");
 	road.push_back(prefixSpacing + "         <material>");
@@ -427,11 +460,17 @@ list<string> XMLGen::generateStraightRoad()
 
 void XMLGen::writeToFile(list<string> textToWrite, string filename)
 {
-	ofstream outputFile(filename, ofstream::out);
-
+	ofstream outputFile(filename.c_str(), ofstream::out);
+/*
 	for (string line : textToWrite)
 	{
 		outputFile << line << endl;
+	}
+*/
+
+	for(list<string>::iterator iter = textToWrite.begin(); textToWrite.end() != iter ;iter++)
+	{
+		outputFile << *iter << endl;
 	}
 
 	outputFile.flush();

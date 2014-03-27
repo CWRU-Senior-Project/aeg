@@ -1,12 +1,10 @@
-// AEG.cpp : Defines the entry point for the console application.
-//
 
-#include "Test.h"
+#include "aeg/Test.h"
 
-int main(int argc, _TCHAR* argv[])
+int main(int argc, char** argv)
 {
-	AEGTester tester;
-	tester.testGenerateWorldFile();
-	return 0;
+   AEGTester tester;
+   tester.testGenerateWorldFile();
+   return 0;
 }
 
