@@ -1,4 +1,5 @@
 #include "aeg/XMLGenerator.h"
+#include <math.h>
 
 using namespace std;
 
@@ -9,6 +10,11 @@ string XMLGen::generateWorldFile()
 	string filename = "TestWorld2.txt";
 	XMLGen::writeToFile(worldContent, filename);
 	return filename;
+}
+
+string XMLGen::generateWorldFile(double length, bool continuous, list<string> terrainList)
+{
+   return generateWorldFile();
 }
 
 list<string> XMLGen::generateWorld()
@@ -44,8 +50,26 @@ list<string> XMLGen::generateWorld()
 	temp = generateGrassPlane();
 	world.splice(world.end(), temp);
 
-	temp = generateStraightRoad(50.0, 7.0, 3.14159/4);
+        double point1[] = { 0.0, 0.0, 0.0 };
+        double point2[] = { 50.0, 0.0, 0.0 };
+        double point3[] = { 0.0, 50.0, 0.0 };
+
+        vector<double> start (point1, point1 + sizeof(point1) / sizeof(double));
+        vector<double> end   (point2, point2 + sizeof(point2) / sizeof(double));
+        vector<double> third (point3, point3 + sizeof(point3) / sizeof(double));
+
+        double width = 10;
+
+        temp = generateStraightRoad(start, end, width);
 	world.splice(world.end(), temp);
+        temp = generateStraightRoad(start, third, width);
+        world.splice(world.end(), temp);
+        temp = generateStraightRoad(end, third, width);
+	world.splice(world.end(), temp);
+
+
+//	temp = generateStraightRoad(50.0, 7.0, 3.14159/4);
+//	world.splice(world.end(), temp);
 
 	world.push_back(prefixSpacing + "   </world>");
 	world.push_back(prefixSpacing + "</sdf>");
@@ -292,32 +316,63 @@ list<string> XMLGen::generateGrassPlane()
 	return road;
 }
 
+list<string> XMLGen::generatePathFromStraightRoads(list<vector<double> > inputList)
+{
+   return generateStraightRoad();
+}
+
 list<string> XMLGen::generateStraightRoad(double length, double width, double angle)
+{
+   double point[] = { 40.0, 0.0, 0.0 };
+   vector<double> startingPoint (point, point + sizeof(point) / sizeof(double));
+   return generateStraightRoad(startingPoint, length, width, angle);
+}
+
+list<string> XMLGen::generateStraightRoad(vector<double> start, vector<double> end, double width)
+{
+   double xLength = (start[0] - end[0]);
+   double yLength = (start[1] - end[1]);
+   double zLength = (start[2] - end[2]);
+printf("start:\t(%f, %f, %f)\nend:\t(%f, %f, %f)\ndelta:\t(%f, %f, %f)\n", start[0], start[1], start[2], end[0], end[1], end[2], xLength, yLength, zLength);
+   double length = sqrt(pow(xLength, 2) + pow(yLength, 2));
+   double angle = atan (yLength / xLength);
+printf("Angle:\t%f\tLength:\t%f\n", angle, length);
+   return generateStraightRoad(start, length, width, angle);
+}
+
+list<string> XMLGen::generateStraightRoad(vector<double> start, double length, double width, double angle)
 {
 	list<string> road;
 
 	string prefixSpacing = "      ";
-
-	road.push_back(prefixSpacing + "<model name='straightRoad'>");
+stringstream sstream;
+sstream << angle;
+string id = sstream.str();
+sstream.str(string());
+	road.push_back(prefixSpacing + "<model name='straightRoad" + id +"'>");
 	road.push_back(prefixSpacing + "   <static>1</static>");
 
 	road.push_back(prefixSpacing + "   <link name='roadLink_1'>");
 
-	//	pose: start at origin
-	stringstream sstream;
-	sstream << width / 2;
-	string tempWidth = sstream.str();
+	//	pose calculations
+//	stringstream sstream;
+	sstream << (width / 2) + start[0];
+	string xPos = sstream.str();
         sstream.str(string());
 	
-        sstream << length / 2;
-	string tempLength = sstream.str();
+        sstream << (length / 2) + start[1];
+	string yPos = sstream.str();
+        sstream.str(string());
+
+        sstream << 0.1 + start[2];
+        string zPos = sstream.str();
         sstream.str(string());
 	
         sstream << angle;
 	string tempAngle = sstream.str();
         sstream.str(string());
 
-	road.push_back(prefixSpacing + "   <pose>" + tempWidth + " " + tempLength + " 0.1  0 0 " + tempAngle + "</pose>");
+	road.push_back(prefixSpacing + "   <pose>" + xPos + " " + yPos + " " + zPos + "  0 0 " + tempAngle + "</pose>");
 	
 
 	//	Collision
@@ -327,11 +382,11 @@ list<string> XMLGen::generateStraightRoad(double length, double width, double an
 	road.push_back(prefixSpacing + "               <normal>0 0 1</normal>");
 
 	sstream << width;
-	tempWidth = sstream.str();
+	string tempWidth = sstream.str();
         sstream.str(string());
 
 	sstream << length;
-	tempLength = sstream.str();
+	string tempLength = sstream.str();
         sstream.str(string());
 
 	road.push_back(prefixSpacing + "               <size>" + tempWidth + " " + tempLength + "</size>");

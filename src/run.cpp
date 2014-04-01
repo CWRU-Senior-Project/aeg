@@ -1,5 +1,6 @@
 
 #include "aeg/Test.h"
+#include "aeg/XMLGenerator.h"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -25,8 +26,11 @@ int main(int argc, char** argv)
    printf("Contin:\t%s\n", (continuous)?"true":"false");
    printf("List:\t%d\n", terrainList.size());
 
-   AEGTester tester;
-   tester.testGenerateWorldFile();
+   XMLGen testGen;
+   testGen.generateWorldFile();
+
+//   AEGTester tester;
+//   tester.testGenerateWorldFile();
    return 0;
 }
 

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ class XMLGen
    //	Public methods
 public:
    string generateWorldFile();
+   string generateWorldFile(double length, bool continuous, list<string> terrainList);
    list<string> generateWorld();
    list<string> generateModel();
    list<string> generateLink();
@@ -30,6 +32,9 @@ public:
    list<string> generateGrassPlane();
    list<string> generateStraightRoad();
    list<string> generateStraightRoad(double length, double width, double angle);
+   list<string> generateStraightRoad(vector<double> start, double length, double width, double angle);
+   list<string> generateStraightRoad(vector<double> start, vector<double> end, double width);
+   list<string> generatePathFromStraightRoads(list<vector<double> > inputList);
 
    void writeToFile(list<string> textToWrite, string filename);
 
