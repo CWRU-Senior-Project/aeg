@@ -15,7 +15,7 @@ list<string> PathGen::generatePath(double pathLength, bool continuous, list<stri
 	int index = 0;
 	list<vector<double> >::iterator nextIter = pathPoints.begin();
 	nextIter++;
-	for (list<vector<double> >::iterator iter = pathPoints.begin(); pathPoints.end() != nextIter; iter++, nextIter++, index++)
+	for (list<vector<double> >::iterator iter = pathPoints.begin(); pathPoints.end() != iter; iter++, nextIter++, index++)
 	{
 		vector<double> start = *iter;
                 vector<double> end = *nextIter;
@@ -24,6 +24,7 @@ list<string> PathGen::generatePath(double pathLength, bool continuous, list<stri
 		if ((continuous) && (pathPoints.end() == nextIter))
 		{
 			end = *pathPoints.begin();
+			nextIter = iter;
 		}
 
 		//	generate path segment with start and end
@@ -40,9 +41,9 @@ list<string> PathGen::generateRoadSegment(vector<double> start, vector<double> e
 {
 	list<string> segmentDescription;
 
-	
-
-	return segmentDescription;
+	// translate end points into length, angle
+	return generateRoadSegment(start, 10, 10, 0, segmentNum);
+//	return segmentDescription;
 }
 
 list<string> PathGen::generateRoadSegment(vector<double> start, double length, double width, double angle, int segmentNum)
