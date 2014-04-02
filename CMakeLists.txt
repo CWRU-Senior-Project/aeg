@@ -161,6 +161,6 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(AEG src/run.cpp src/Test.cpp src/XMLGenerator.cpp)
+add_executable(AEG src/run.cpp src/Test.cpp src/XMLGenerator.cpp src/PathGen.cpp)
 target_link_libraries(AEG ${catkin_LIBRARIES})
 add_dependencies(AEG ${catkin_EXPORTED_TARGETS})
