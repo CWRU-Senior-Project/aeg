@@ -1,15 +1,10 @@
-
+#include "aeg/Run.h"
 #include "aeg/Test.h"
 #include "aeg/XMLGenerator.h"
 #include <vector>
-#include <string>
 #include <algorithm>
 
-void printOptions();
-double getRoadLength(string userInput);
-bool isContinuous(string userInput);
-list<string> getTerrain(string userInput);
-string getConcatLowerInput(int argc, char** argv);
+
 
 int main(int argc, char** argv)
 {
