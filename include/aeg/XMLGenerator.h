@@ -37,6 +37,8 @@ public:
    list<string> generatePathFromStraightRoads(list<vector<double> > inputList);
 
    void writeToFile(list<string> textToWrite, string filename);
+   list<string> getVehicle();
+   list<string> getVRCPlugin();
 
    //	Private methods
 private:
