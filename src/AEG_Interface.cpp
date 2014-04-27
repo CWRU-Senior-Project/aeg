@@ -1,17 +1,22 @@
-#include "aeg/Run.h"
-//#include "aeg/Test.h"
-//#include "aeg/XMLGenerator.h"
+#include "aeg/AEG_Interface.h"
+#include "aeg/XMLGenerator.h"
 #include <vector>
 #include <algorithm>
+#include <cstdio>
+#include <sstream>
 
-
-// TODO: revise main program
 int AEG_Interface::main(int argc, char** argv)
 {
-   printOptions();
-  
    string inputLine = getConcatLowerInput(argc, argv);
-   printf("Input line:\t%s\n\n", inputLine.c_str());
+//   printf("Input line:\t%s\n\n", inputLine.c_str());
+
+   bool help = getHelpState(inputLine);
+
+   if (help)
+   {
+      printOptions();
+      return 0;
+   }
 
    double length = getRoadLength(inputLine);
    bool continuous = isContinuous(inputLine);
@@ -19,14 +24,39 @@ int AEG_Interface::main(int argc, char** argv)
 
    printf("Length:\t%f\n", length);
    printf("Contin:\t%s\n", (continuous)?"true":"false");
-   printf("List:\t%d\n", terrainList.size());
 
-//   XMLGen testGen;
-//   testGen.generateWorldFile();
+   stringstream ss;
+   for (list<string>::iterator iter = terrainList.begin(); terrainList.end() != iter; iter++)
+   {
+      string temp = *iter;
+      ss << temp << ",";
+   }
+   printf("List:\t%s\n", ss.str().c_str());
 
-//   AEGTester tester;
-//   tester.testGenerateWorldFile();
+   XMLGen testGen;
+   testGen.generateWorldFile();
    return 0;
+}
+
+bool AEG_Interface::getHelpState(string userInput)
+{
+   bool help = false;
+
+   string labelStrings[] = { "--help", "-h" };
+   vector<string> labels (labelStrings, labelStrings + sizeof(labelStrings) / sizeof(string));
+
+   for (int i = 0; labels.size() > i; i++)
+   {
+      size_t found = userInput.find(labels[i]);
+
+      if (string::npos != found)
+      {
+         help = true;
+         break;
+      }
+   }
+
+   return help;
 }
 
 string AEG_Interface::getConcatLowerInput(int argc, char** argv)
@@ -90,6 +120,11 @@ list<string> AEG_Interface::getTerrain(string userInput)
       }
    }
 
+   for (list<string>::iterator iter = terrainList.begin(); terrainList.end() != iter; iter++)
+   {
+      printf("_%s_\n", (*iter).c_str());
+   }
+
    return terrainList;
 }
 
@@ -140,5 +175,3 @@ double AEG_Interface::getRoadLength(string userInput)
 
    return length;
 }
-
-

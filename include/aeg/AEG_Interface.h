@@ -8,6 +8,9 @@
 #define _AEG_INTERFACE_H_
 
 #include <string>
+#include <list>
+
+using namespace std;
 
 class AEG_Interface
 {
@@ -35,8 +38,11 @@ class AEG_Interface
       // check if user specified path continuity
       bool isContinuous(string userInput);
 
+      // check if help command specified
+      bool getHelpState(string userInput);
+
       // retrieve road length if specified
       double getRoadLength(string userInput);
-}
+};
 
 #endif
