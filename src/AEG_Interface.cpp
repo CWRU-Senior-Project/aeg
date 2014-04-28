@@ -85,7 +85,7 @@ void AEG_Interface::printOptions()
    ss << "  continuous\tSpecify that road should be a loop. Default is off\n";
    ss << "  help\t\tDisplays this message\n\n";
 
-   printf(ss.str().c_str());
+   printf("%s",ss.str().c_str());
 }
 
 list<string> AEG_Interface::getTerrain(string userInput)
