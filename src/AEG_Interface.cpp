@@ -34,7 +34,7 @@ int AEG_Interface::main(int argc, char** argv)
    printf("List:\t%s\n", ss.str().c_str());
 
    XMLGen testGen;
-   testGen.generateWorldFile();
+   testGen.generateWorldFile(length, continuous, terrainList);
    return 0;
 }
 

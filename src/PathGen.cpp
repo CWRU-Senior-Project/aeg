@@ -3,37 +3,43 @@
 #include <algorithm>
 #include <cmath>
 #include <sstream>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
 
 list<string> PathGen::generatePath(double pathLength, bool continuous, list<string> terrainList, string modelName)
 {
    list<string> pathList;
    double width = 10;
-   //	TODO: add initial model description
+
+   // name road after timestamp
+   pathList.push_back("<model name='" + modelName +"'>");
+   pathList.push_back("   <static>1</static>");
 
    list<vector<double> > pathPoints = selectPoints(pathLength, continuous);
 
    int index = 0;
    list<vector<double> >::iterator nextIter = pathPoints.begin();
    nextIter++;
-   for (list<vector<double> >::iterator iter = pathPoints.begin(); pathPoints.end() != iter; iter++, nextIter++, index++)
+   for (list<vector<double> >::iterator iter = pathPoints.begin(); pathPoints.end() != nextIter && pathPoints.end() != iter && pathPoints.size() > index; iter++, nextIter++, index++)
    {
       vector<double> start = *iter;
       vector<double> end = *nextIter;
-
+/*
       // if circular course and last point reached, connect to start
       if ((continuous) && (pathPoints.end() == nextIter))
       {
          end = *pathPoints.begin();
          nextIter = iter;
       }
-
+*/
       //	generate path segment with start and end
+
       list<string> temp = generateRoadSegment(start, end, width, index);
       pathList.splice(pathList.end(), temp);
    }
-
-   //	TODO: add supplemental model description
-
+   pathList.push_back("</model>");
    return pathList;
 }
 
@@ -41,20 +47,43 @@ list<string> PathGen::generatePath(double pathLength, bool continuous, list<stri
 list<string> PathGen::generateRoadSegment(vector<double> start, vector<double> end, double width, int segmentNum)
 {
    list<string> segmentDescription;
+   double length = 0;
 
+   vector<double>::iterator startIter = start.begin();
+   vector<double>::iterator endIter = end.end();
 
-   return generateRoadSegment(start, 10, 10, 0, segmentNum);
+   for (; start.end() != startIter; startIter++, endIter++)
+   {
+      length += pow(*startIter - *endIter, 2);
+   }
+
+   length = sqrt(pow(start[0] - end[0], 2) + pow(start[1] - end[1], 2));
+
+   double angle = 0;
+   double deltaX = end[0] - start[0];
+   double deltaY = end[1] - start[1];
+   if (0 != deltaX)
+   {
+      angle = atan(deltaY / deltaX);
+   }
+printf("start: (%f, %f, %f)\n", start[0], start[1], start[2]);
+printf("\tend: (%f, %f, %f)\n", end[0], end[1], end[2]);
+printf("\t\tlength: (%f)\tangle: (%f)\n", length, angle);
+   return generateRoadSegment(start, length, width, angle, segmentNum);
 }
 
 list<string> PathGen::generateRoadSegment(vector<double> start, double length, double width, double angle, int segmentNum)
 {
    list<string> road;
+   stringstream sstream;
+   sstream << "roadLink_" << segmentNum;
 
    string prefixSpacing = "      ";
-   road.push_back(prefixSpacing + "   <link name='roadLink_1'>");
+   road.push_back(prefixSpacing + "   <link name='" + sstream.str() + "'>");
 
    // pose: start at origin
-   stringstream sstream;
+
+   sstream.str(string());
    sstream << width / 2;
    string tempWidth = sstream.str();
    sstream.str(string());
@@ -132,11 +161,7 @@ list<string> PathGen::generateRoadSegment(vector<double> start, double length, d
    road.push_back(prefixSpacing + "      <gravity>1</gravity>");
 
    road.push_back(prefixSpacing + "   </link>");
-
-//	road.push_back(prefixSpacing + "</model>");
-
-
-return road;
+   return road;
 }
 
 list<vector<double> > PathGen::selectPoints(double pathLength, bool continuous)
@@ -157,27 +182,33 @@ list<vector<double> > PathGen::selectPoints(double pathLength, bool continuous)
    double nextAngle = 0;
    int angleDevMR = 400;
    int minPoints = 3;
+   int maxPoints = 20;
+   int pointCount = 0;
 
    while (0 < remainingLength)
    {
       // if remaining length < 10% of path length, set last point distance to remainingDistance
-      if ((pathLength / 10) > remainingLength)
+      if (
+         ((pathLength / 10) > remainingLength) || ((maxPoints - 2) < pointCount))
       {
          nextLength = remainingLength;
       }
       else
       {
-         nextLength = rand() % int(remainingLength);
+         nextLength = rand() % int(remainingLength - 5) + 5;
       }
 
       // TODO: add angle variability
-      nextAngle = 0;
+//      srand(4);
+      nextAngle = rand() % int (2 * angleDevMR);
+//      nextAngle = 0;
 		
       nextPoint = selectRestrictedPoint(lastPoint, nextLength, nextAngle, angleDevMR);
       pathPoints.push_back(nextPoint);
       lastPoint = nextPoint;
       remainingLength -= nextLength;
       lastAngle = nextAngle;
+      pointCount++;
    }
 
    return pathPoints;
@@ -191,7 +222,7 @@ vector<double> PathGen::selectRestrictedPoint(vector<double> start, double lengt
    srand(time(NULL));
    int randAngle = rand() % int (2 * angleDevMR);
    randAngle = (randAngle < angleDevMR) ? -1 * (randAngle % int(angleDevMR)) : randAngle % int(angleDevMR);
-   double angle = startingAngle + (randAngle / 1000.0);  // TODO: check that randAngle is treated as double
+   double angle = startingAngle + (((double) randAngle) / 1000.0);  // TODO: check that randAngle is treated as double
 
    // Select terminal point given starting point and angle
    double xPos = start[0] + length * cos(angle);

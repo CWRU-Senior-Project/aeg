@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "PathGen.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ class XMLGen
 public:
    string generateWorldFile();
    string generateWorldFile(double length, bool continuous, list<string> terrainList);
-   list<string> generateWorld();
+   list<string> generateWorld(double length, bool continuous, list<string> terrainList);
    list<string> generateModel();
    list<string> generateLink();
    list<string> generateSphericalCoordinates();
@@ -42,6 +43,6 @@ public:
 
    //	Private methods
 private:
-
+   PathGen pathGen;
 };
 #endif
